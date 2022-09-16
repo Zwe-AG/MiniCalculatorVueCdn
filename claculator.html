@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Calculator</title>
+    <!-- Bootstrap   -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        * {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            font-size: 20px;
+        }
+
+        body {
+            background-image: url('https://wallpaperaccess.com/full/2435550.png');
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app" class="container">
+
+        <div class="row my-5 justify-content-center">
+            <div class="col-6">
+                <div class="card" style="background-color:bisque;">
+                    <h3 class="text-center mt-2">My Calculator</h3>
+                    <div class="card-body">
+                        <div
+                            class="border p-3 rounded d-flex justify-content-end align-items-center bg-dark text-white">
+                            {{ answer }}
+                        </div>
+                        <div class="row mt-4">
+                            <div class="form-group col-6 mb-3">
+                                <input type="text" class="form-control" placeholder="Enter first number....."
+                                    v-model="userInput.firstNumber">
+                                <small class="text-danger" v-if="validation.firstNumberStatus">First Number is
+                                    Required</small>
+                            </div>
+                            <div class="form-group col-6 mb-3">
+                                <input type="text" class="form-control" placeholder="Enter second number....."
+                                    v-model="userInput.secondNumber">
+                                <small class="text-danger" v-if="validation.secondNumberStatus">Second Number is
+                                    Required</small>
+                            </div>
+                            <div class="col-4">
+                                <select class="form-control" v-model="userInput.operators">
+                                    <option>Choose Option</option>
+                                    <option value="+">+</option>
+                                    <option value="-">-</option>
+                                    <option value="*">*</option>
+                                    <option value="/">/</option>
+                                </select>
+                                <small class="text-danger" v-if="validation.operatorStatus">Operator is
+                                    Required</small>
+                            </div>
+                            <div class="col-4">
+                                <button class="btn btn-primary form-control" @click="calculate">Calculate</button>
+                            </div>
+                            <div class="col-4">
+                                <button class="btn btn-danger form-control" @click="clear">Clear</button>
+                            </div>
+                            <div class="col-12 mt-4">
+                                <button class="btn btn-warning form-control" @click="save"
+                                    :disabled="saveStatus">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <h5 class="text-dark">History</h5>
+                        <div class="text-muted fs-6" v-for="history in histories">
+                            <ol>
+                                <li>{{ history }}</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    let app = new Vue({
+        el: "#app",
+        data: {
+            answer: 0,
+            userInput: {
+                firstNumber: "",
+                secondNumber: "",
+                operators: "",
+            },
+            histories: [],
+            validation: {
+                firstNumberStatus: false,
+                secondNumberStatus: false,
+                operatorStatus: false
+            },
+            saveStatus: true,
+        },
+        methods: {
+            calculate() {
+                this.checkValidation();
+                if (this.validation.firstNumberStatus == false && this.validation.secondNumberStatus == false && this.validation.operatorStatus == false) {
+                    let result = this.check();
+                    // alert(result);
+                    // this.answer = result;
+                    this.answer = ` ${this.userInput.firstNumber}  ${this.userInput.operators}  ${this.userInput.secondNumber} = ${result}`;
+                    this.saveStatus = false;
+                    this.clearData();
+                }
+            },
+
+            checkValidation() {
+                this.validation.firstNumberStatus = this.userInput.firstNumber == "" ? true : false;
+                this.validation.secondNumberStatus = this.userInput.secondNumber == "" ? true : false;
+                this.validation.operatorStatus = this.userInput.operators == "" ? true : false;
+            },
+
+            save() {
+                if (this.saveStatus == false) {
+                    this.histories.push(this.answer);
+                    this.answer = 0;
+                    this.saveStatus = true;
+                }
+            },
+
+            clearData() {
+                this.userInput.firstNumber = "";
+                this.userInput.secondNumber = "";
+                this.userInput.operators = "";
+            },
+
+            clear() {
+                this.validation.firstNumberStatus = false;
+                this.validation.secondNumberStatus = false;
+                this.validation.operatorStatus = false;
+                this.answer = 0;
+                this.histories = [];
+                this.clearData();
+            },
+
+            check() {
+                let num1 = parseInt(this.userInput.firstNumber);
+                let num2 = parseInt(this.userInput.secondNumber);
+                switch (this.userInput.operators) {
+                    case "+":
+                        return num1 + num2;
+                        break;
+                    case "-":
+                        return num1 - num2;
+                        break;
+                    case "*":
+                        return num1 * num2;
+                        break;
+                    case "/":
+                        return num1 / num2;
+                        break;
+                    default:
+                        return "Error";
+                        break;
+                }
+            }
+        },
+    })
+</script>
+
+</html>
